@@ -1,0 +1,49 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  buildx:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      -
+        name: Set up Docker Buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v1
+        with:
+          version: latest
+      -
+        name: Available platforms
+        run: echo ${{ steps.buildx.outputs.platforms }}
+      
+      - 
+        name: Docker Login
+        if: success()
+        env:
+          DOCKER_PASSWORD: ${{ secrets.docker_hub_password }}
+        run: |
+          echo "${DOCKER_PASSWORD}" | docker login --username "${{ secrets.docker_hub_username }}" --password-stdin
+      #,linux/arm/v7
+      -
+        name: Run Buildx
+        run: |
+          docker buildx build \
+            --platform linux/amd64,linux/arm/v7 \
+            --output "type=image,push=true" \
+            -t craigham/fantasy-bot:latest .
+
+      - 
+        name: Clear
+        if: always()
+        run: |
+          rm -f ${HOME}/.docker/config.json
