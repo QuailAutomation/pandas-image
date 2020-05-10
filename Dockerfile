@@ -8,6 +8,6 @@ WORKDIR /root
 
 RUN python3 -m venv venv
 RUN source venv/bin/activate
-RUN pip3 install --extra-index-url=https://www.piwheels.org/simple --ignore-installed pandas==1.0.3 lxml==4.5.0 yahoo-oauth==0.1.9 matplotlib==3.2.1 
+RUN . /root/venv/bin/activate && pip3 install --extra-index-url=https://www.piwheels.org/simple --ignore-installed pandas==1.0.3 lxml==4.5.0 yahoo-oauth==0.1.9 matplotlib==3.2.1 
 
 
